@@ -1,0 +1,54 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>WS Test</title></head>
+<body>
+<h3>Omniverse MP Starter – Test Client</h3>
+<button id="create">Create Room</button>
+<input id="room" placeholder="roomId">
+<input id="nick" placeholder="nickname" value="Carlos">
+<button id="join">Join</button>
+<button id="ping">PING</button>
+<input id="msg" placeholder='{"type":"CHAT","payload":{"text":"hola"}}'>
+<button id="send">Send</button>
+<pre id="log"></pre>
+<script>
+const log = (x)=>document.getElementById('log').textContent += x + "\n";
+let ws = null;
+
+document.getElementById('create').onclick = async ()=>{
+  const r = await fetch('http://127.0.0.1:3001/create-room', {method:'POST'});
+  const j = await r.json();
+  document.getElementById('room').value = j.roomId;
+  log('Room created: '+j.roomId);
+};
+
+document.getElementById('join').onclick = async ()=>{
+  const roomId = document.getElementById('room').value.trim();
+  const nickname = document.getElementById('nick').value.trim() || 'player';
+  const r = await fetch('http://127.0.0.1:3001/join-room', {
+    method:'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ roomId, nickname })
+  });
+  const j = await r.json();
+  log('Join response: '+JSON.stringify(j));
+  ws = new WebSocket(j.wsUrl.replace('127.0.0.1','localhost'));
+  ws.onopen = ()=>log('WS connected');
+  ws.onmessage = (ev)=>log('WS <= '+ev.data);
+  ws.onclose = ()=>log('WS closed');
+};
+
+document.getElementById('ping').onclick = ()=>{
+  if (ws) ws.send(JSON.stringify({type:'PING', payload:{}}));
+};
+
+document.getElementById('send').onclick = ()=>{
+  if (!ws) return;
+  try {
+    const obj = JSON.parse(document.getElementById('msg').value);
+    ws.send(JSON.stringify(obj));
+  } catch (e) {
+    log('Invalid JSON');
+  }
+};
+</script>
+</body></html>
