@@ -23,6 +23,32 @@ It was developed as part of my portfolio for **Omniverse Studios (Alicante)** to
 
 ##  Architecture  
 UE5 Client <----> REST API (Create/Join Room)
-| |
-+------ WebSocket -------> Realtime Gateway
+
+------ WebSocket -------> Realtime Gateway
+
+
+Each client can:
+- Create and join rooms.
+- Exchange messages via WebSocket.
+- Receive system events (`WELCOME`, `PLAYER_JOINED`, `BROADCAST`, `PONG`).
+
+---
+
+##  How to Run Locally  
+
+- bash
+cp .env.example .env
+npm install
+npm run dev
+#  http://127.0.0.1:3001
+
+-- Then open test-client.html
+1. Click Create Room and copy the roomId.
+
+2. In both tabs, Join with different nicknames (e.g., Carlos / Tester).
+
+3. Send a JSON message:
+{"type":"CHAT","payload":{"text":"hello team"}}
+
+
 
