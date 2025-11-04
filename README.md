@@ -1,63 +1,28 @@
-# Omniverse Multiplayer Starter (Lobby + Matchmaking + WS)
+# Omniverse Multiplayer Starter  
+**Author:** Carlos Alfredo Callagua Llaque  
+**GitHub:** [Carlsalf](https://github.com/Carlsalf)  
+**Location:** Alicante, Spain  
 
-Minimal, production‑friendly starter to demonstrate **networked multiplayer concepts** for a UE5 role:
-- **Lobby & Matchmaking** (REST)
-- **Realtime transport** (WebSocket)
-- **Room broadcast with basic state** (in‑memory for demo)
-- Clean, documented code you can extend to **Epic Online Services** or a dedicated server
+---
 
-> Objetivo: mostrar tu entendimiento de arquitectura cliente‑servidor lista para conectar desde **Unreal Engine 5** (BP o C++), sin depender todavía de EOS.
+## Overview  
+This project is a lightweight **multiplayer networking starter** built with **Node.js + WebSocket**, designed to demonstrate a real-time client-server architecture suitable for **Unreal Engine 5** and **Epic Online Services (EOS)** integration.  
 
-## Arquitectura
+It was developed as part of my portfolio for **Omniverse Studios (Alicante)** to showcase practical skills in backend systems, lobby management, and real-time communication.  
 
-```
-UE5 Client <—— WebSocket ——> Realtime Gateway (ws://host/ws)
-      |                                 |
-      +—— REST (HTTP) ——> Lobby/Matchmaking (create/join/leave)
-```
+---
 
-- **/health**: liveness probe
-- **POST /create-room**: crea sala (returns roomId)
-- **POST /join-room**: une jugador a la sala (returns wsUrl + token mock)
-- **WS /ws?roomId=…&playerId=…**: envío/recepción de mensajes JSON
+##  Features  
+ REST API for **Lobby & Matchmaking** (`/create-room`, `/join-room`)  
+ WebSocket gateway for **real-time communication** (`/ws?roomId=...&playerId=...`)  
+ **Broadcast system** for chat and gameplay replication  
+ **In-memory room management** (can be upgraded to Redis)  
+ HTML test client for simulating multiple players  
 
-## Ejecutar
+---
 
-```bash
-cp .env.example .env
-npm i
-npm run dev
-# API: http://127.0.0.1:3001
-```
+##  Architecture  
+UE5 Client <----> REST API (Create/Join Room)
+| |
++------ WebSocket -------> Realtime Gateway
 
-## Prueba rápida (sin UE)
-
-1) En el navegador abre **test-client.html** (doble click).  
-2) Pulsa **Create Room** y luego **Join** desde dos pestañas.  
-3) Envía mensajes y verás el **broadcast** dentro de la misma sala.
-
-## Conectar desde UE5 (Blueprint/C++)
-
-- **Blueprints**: usa un plugin de WebSocket (por ejemplo, VaRest para REST + cualquier WS plugin) para:
-  1. `POST /create-room` → guarda `roomId`
-  2. `POST /join-room` → recibe `playerId` y `wsUrl`
-  3. Conecta a `wsUrl` y envía JSON con `{type, payload}`
-- **C++**: utilizar `libwebsockets` o un plugin WS. El formato de mensajes ya está definido en `protocol.md`.
-
-> En producción, sustituye WS por EOS P2P o **EOS Sessions**; el **lobby service** de este starter sirve de orquestador/apellidos de sesión.
-
-## Escalabilidad (ruta rápida)
-
-- Cambiar **in‑memory** por Redis para **rooms** y **pub/sub**.
-- Añadir **JWT** y **rate‑limit** al REST/WS.
-- Ejecutar varias instancias detrás de **Nginx** o **Cloud Load Balancer**.
-- Persistir métricas con Prometheus + Grafana.
-
-## Endpoints
-
-- `GET /health` → `{ ok: true }`
-- `POST /create-room` → `{ roomId }`
-- `POST /join-room` (body: `{ roomId, nickname }`) → `{ playerId, wsUrl }`
-
-## Licencia
-MIT – hecho para tu candidatura a **Omniverse Studios (Alicante)**.
